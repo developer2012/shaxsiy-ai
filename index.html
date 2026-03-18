@@ -7,33 +7,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #38bdf8;
-            --text: #f1f5f9;
-            --danger: #ef4444;
-            --success: #22c55e;
+            --bg: #0f172a; --card: #1e293b; --accent: #38bdf8;
+            --text: #f1f5f9; --danger: #ef4444; --success: #22c55e;
         }
 
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
+            background-color: var(--bg); color: var(--text);
+            margin: 0; display: flex; flex-direction: column;
+            align-items: center; padding: 20px;
         }
 
         .container { width: 100%; max-width: 650px; }
 
         .card {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            background: var(--card); padding: 25px; border-radius: 16px;
+            margin-bottom: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
         h2 { margin-top: 0; font-size: 1.3rem; color: var(--accent); display: flex; align-items: center; gap: 10px; }
@@ -41,41 +30,25 @@
         .input-group { display: flex; gap: 10px; margin-top: 15px; }
 
         input[type="text"] {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-            outline: none;
+            flex: 1; padding: 12px; border-radius: 8px;
+            border: 1px solid #334155; background: #0f172a;
+            color: white; outline: none;
         }
 
         input[type="text"]:focus { border-color: var(--accent); }
 
         button {
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: none;
-            background: var(--accent);
-            color: #0f172a;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
+            padding: 12px 20px; border-radius: 8px; border: none;
+            background: var(--accent); color: #0f172a;
+            font-weight: bold; cursor: pointer; transition: all 0.2s;
         }
 
         button:hover { opacity: 0.9; transform: translateY(-1px); }
 
         #chat-box {
-            height: 350px;
-            overflow-y: auto;
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #334155;
-            margin: 15px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            height: 350px; overflow-y: auto; background: #0f172a;
+            padding: 15px; border-radius: 10px; border: 1px solid #334155;
+            margin: 15px 0; display: flex; flex-direction: column; gap: 10px;
         }
 
         .msg-row { margin-bottom: 5px; line-height: 1.5; }
@@ -83,19 +56,14 @@
         .ai-label { color: var(--success); font-weight: bold; }
 
         .mic-btn {
-            background: var(--danger);
-            color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: var(--danger); color: white;
+            width: 48px; height: 48px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .active-mic {
             animation: pulse 1.2s infinite;
-            background: var(--success);
+            background: var(--success) !important;
         }
 
         @keyframes pulse {
@@ -104,15 +72,10 @@
         }
 
         .key-display {
-            margin-top: 15px;
-            padding: 12px;
-            background: #064e3b;
-            color: #34d399;
-            border-radius: 8px;
-            display: none;
-            font-family: 'Consolas', monospace;
-            font-size: 0.9rem;
-            border: 1px solid #065f46;
+            margin-top: 15px; padding: 12px; background: #064e3b;
+            color: #34d399; border-radius: 8px; display: none;
+            font-family: 'Consolas', monospace; font-size: 0.9rem;
+            border: 1px solid #065f46; word-break: break-all;
         }
     </style>
 </head>
@@ -136,13 +99,13 @@
     <div class="card">
         <h2><i class="fas fa-comment-dots"></i> AI Chat (Voice Enabled)</h2>
         <div id="chat-box">
-            <div style="color: #64748b; font-style: italic;">Muloqotni boshlash uchun API kalit yarating va xabar yozing...</div>
+            <div style="color: #64748b; font-style: italic;">Muloqotni boshlash uchun API kalit yarating...</div>
         </div>
         <div class="input-group">
             <button id="micBtn" class="mic-btn" onclick="toggleSTT()">
                 <i class="fas fa-microphone"></i>
             </button>
-            <input type="text" id="msgInput" placeholder="Xabarni shu yerga yozing...">
+            <input type="text" id="msgInput" placeholder="Xabarni yozing...">
             <button onclick="askAI()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -155,34 +118,49 @@
     const chatBox = document.getElementById('chat-box');
     const keyShow = document.getElementById('keyShow');
 
-    // 1. Ovozni aniqlash (Speech Recognition)
+    // --- 1. OVOZNI ANIQLASH (SPEECH RECOGNITION) ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
 
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.lang = 'uz-UZ';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            micBtn.classList.add('active-mic');
+        };
+
         recognition.onresult = (event) => {
-            msgInput.value = event.results[0][0].transcript;
+            const transcript = event.results[0][0].transcript;
+            msgInput.value = transcript;
+        };
+
+        recognition.onend = () => {
             micBtn.classList.remove('active-mic');
         };
-        recognition.onerror = () => micBtn.classList.remove('active-mic');
-        recognition.onend = () => micBtn.classList.remove('active-mic');
+
+        recognition.onerror = () => {
+            micBtn.classList.remove('active-mic');
+        };
     }
 
     function toggleSTT() {
-        if (!recognition) return alert("Brauzeringiz ovozli yozishni qo'llab-quvvatlamaydi.");
-        micBtn.classList.add('active-mic');
-        recognition.start();
+        if (!recognition) return alert("Brauzeringiz ovozni qo'llab-quvvatlamaydi.");
+        try {
+            recognition.start();
+        } catch (e) {
+            recognition.stop();
+        }
     }
 
-    // 2. API KALIT YARATISH
+    // --- 2. API KALIT YARATISH ---
     async function generateKey() {
         const user = document.getElementById('username').value;
         if (!user) return alert("Iltimos, ism kiriting!");
 
         try {
-            // Backend 5000 portda bo'lgani uchun to'liq manzilni yozamiz
             const res = await fetch('https://shaxsiy-ai.onrender.com/generate-key', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -194,17 +172,16 @@
             keyShow.innerText = "Sizning API Kalitingiz: " + myApiKey;
             keyShow.style.display = "block";
         } catch (e) {
-            alert("Xatolik: Python server (backend) yoniq ekanligiga ishonch hosil qiling!");
+            alert("Backendga ulanishda xatolik!");
         }
     }
 
-    // 3. AI BILAN MULOQOT
+    // --- 3. AI BILAN MULOQOT ---
     async function askAI() {
         const text = msgInput.value.trim();
         if (!text) return;
         if (!myApiKey) return alert("Avval API kalit yarating!");
 
-        // Foydalanuvchi xabarini qo'shish
         chatBox.innerHTML += `<div class="msg-row"><span class="user-label">Siz:</span> ${text}</div>`;
         msgInput.value = "";
         
@@ -225,6 +202,8 @@
                 body: JSON.stringify({ message: text })
             });
 
+            if (!response.ok) throw new Error("Server xatosi");
+
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             span.innerText = "";
@@ -236,11 +215,13 @@
                 const chunk = decoder.decode(value).split("\n");
                 chunk.forEach(line => {
                     if (line.startsWith("data: ")) {
-                        const data = JSON.parse(line.substring(6));
-                        if(data.reply) {
-                            span.innerText += data.reply;
-                            chatBox.scrollTop = chatBox.scrollHeight;
-                        }
+                        try {
+                            const data = JSON.parse(line.substring(6));
+                            if(data.reply) {
+                                span.innerText += data.reply;
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                            }
+                        } catch(e) {}
                     }
                 });
             }
@@ -249,7 +230,6 @@
         }
     }
 
-    // Enter tugmasi bilan yuborish
     msgInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") askAI();
     });
