@@ -183,7 +183,7 @@
 
         try {
             // Backend 5000 portda bo'lgani uchun to'liq manzilni yozamiz
-            const res = await fetch('http://localhost:5000/generate-key', {
+            const res = await fetch('https://shaxsiy-ai.onrender.com/generate-key', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: user })
@@ -216,7 +216,7 @@
         chatBox.scrollTop = chatBox.scrollHeight;
 
         try {
-            const response = await fetch('http://localhost:5000/v1/chat', {
+            const response = await fetch('https://shaxsiy-ai.onrender.com/v1/chat', {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
