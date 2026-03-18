@@ -9,6 +9,7 @@ import ollama
 
 app = FastAPI()
 
+# CORS - Barcha manbalardan ulanishga ruxsat
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,7 +25,7 @@ async def read_index():
         with open("index.html", "r", encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        return "index.html fayli topilmadi!"
+        return "<h1>index.html topilmadi!</h1>"
 
 @app.post("/generate-key")
 async def create_key(request: Request):
@@ -45,14 +46,13 @@ async def chat_endpoint(request: Request):
     async def stream_gen():
         client = ollama.AsyncClient()
         try:
-            # Render Free uchun llama3.2:1b tavsiya etiladi (eng engili)
             async for chunk in await client.chat(
-                model='llama3.2:1b', 
+                model='llama3', 
                 messages=[{'role': 'user', 'content': user_msg}],
                 stream=True
             ):
-                if chunk and 'message' in chunk:
-                    yield f"data: {json.dumps({'reply': chunk['message']['content']})}\n\n"
+                content = chunk['message']['content']
+                yield f"data: {json.dumps({'reply': content})}\n\n"
         except Exception as e:
             yield f"data: {json.dumps({'error': str(e)})}\n\n"
 
@@ -60,6 +60,6 @@ async def chat_endpoint(request: Request):
 
 if __name__ == "__main__":
     import uvicorn
-    # RENDER UCHUN PORTNI DINAMIK OLISH:
+    # Render PORT ni o'zi tayinlaydi
     port = int(os.environ.get("PORT", 5000))
     uvicorn.run(app, host="0.0.0.0", port=port)
