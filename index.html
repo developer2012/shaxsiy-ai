@@ -17,7 +17,7 @@
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background: radial-gradient(circle at top right, #1e1b4b, #0f172a);
             color: var(--text);
             margin: 0;
@@ -33,7 +33,7 @@
 
         header { text-align: center; margin-bottom: 40px; }
         header h1 { font-size: 3rem; margin: 0; background: linear-gradient(to right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        header p { color: #94a3b8; letter-spacing: 1px; }
+        header p { color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; }
 
         .glass-card {
             background: var(--card-bg);
@@ -45,7 +45,7 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
 
-        h2 { font-size: 1.2rem; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--primary); }
+        h2 { font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--primary); }
 
         .input-group { display: flex; gap: 12px; }
         input[type="text"] {
@@ -54,7 +54,7 @@
             padding: 14px 18px; border-radius: 12px; color: white;
             transition: 0.3s; font-size: 1rem;
         }
-        input[type="text"]:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1); }
+        input[type="text"]:focus { border-color: var(--primary); outline: none; }
 
         button {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -62,22 +62,22 @@
             border-radius: 12px; font-weight: 700; cursor: pointer;
             transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        button:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2); }
+        button:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
         #chat-box {
-            height: 400px; overflow-y: auto;
+            height: 380px; overflow-y: auto;
             display: flex; flex-direction: column; gap: 15px;
             padding-right: 10px; margin: 20px 0;
             scrollbar-width: thin; scrollbar-color: var(--primary) transparent;
         }
 
-        .message { max-width: 85%; padding: 12px 18px; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; }
+        .message { max-width: 85%; padding: 12px 18px; border-radius: 18px; line-height: 1.5; font-size: 0.95rem; position: relative; }
         .user-msg { align-self: flex-end; background: var(--primary); color: #0f172a; border-bottom-right-radius: 4px; }
         .ai-msg { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
 
         .mic-btn {
-            width: 50px; height: 50px; border-radius: 50%; padding: 0;
-            justify-content: center; background: #ef4444; color: white;
+            width: 52px; height: 52px; border-radius: 50%; padding: 0;
+            justify-content: center; background: var(--error); color: white;
         }
         .active-mic { background: var(--success) !important; animation: pulse 1.5s infinite; }
 
@@ -86,7 +86,8 @@
         .key-badge {
             display: none; margin-top: 15px; padding: 12px;
             background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success);
-            color: var(--success); border-radius: 12px; font-family: monospace;
+            color: var(--success); border-radius: 12px; font-family: 'Consolas', monospace;
+            word-break: break-all;
         }
     </style>
 </head>
@@ -95,26 +96,28 @@
 <div class="container">
     <header>
         <h1>Sharofiddin AI</h1>
-        <p>ADVANCED API & VOICE INTELLIGENCE</p>
+        <p>Advanced API & Voice Intelligence</p>
     </header>
 
     <div class="glass-card">
-        <h2><i class="fas fa-key"></i> API Access Control</h2>
+        <h2><i class="fas fa-shield-halved"></i> API Access Control</h2>
         <div class="input-group">
-            <input type="text" id="username" placeholder="Foydalanuvchi nomi...">
-            <button onclick="generateKey()"><i class="fas fa-plus"></i> Kalit olish</button>
+            <input type="text" id="username" placeholder="Enter username to generate key...">
+            <button onclick="generateKey()"><i class="fas fa-key"></i> Get Key</button>
         </div>
         <div id="keyShow" class="key-badge"></div>
     </div>
 
     <div class="glass-card">
-        <h2><i class="fas fa-robot"></i> Neural Network Chat</h2>
+        <h2><i class="fas fa-brain"></i> Neural Network Chat</h2>
         <div id="chat-box">
-            <div class="ai-msg message">Tizim tayyor. API kalit yarating va muloqotni boshlang.</div>
+            <div class="ai-msg message">Ready. Generate an API key to start muloqot.</div>
         </div>
         <div class="input-group">
-            <button id="micBtn" class="mic-btn" onclick="toggleSTT()"><i class="fas fa-microphone"></i></button>
-            <input type="text" id="msgInput" placeholder="Xabarni shu yerga yozing...">
+            <button id="micBtn" class="mic-btn" title="English Voice Input" onclick="toggleSTT()">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <input type="text" id="msgInput" placeholder="Type your message here...">
             <button onclick="askAI()"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -122,47 +125,73 @@
 
 <script>
     let myApiKey = "";
-    const BASE_URL = window.location.origin;
+    // Renderda BASE_URL o'zgaruvchan bo'ladi, window.location.origin uni to'g'ri oladi
+    const BASE_URL = "https://shaxsiy-ai.onrender.com/"; // RENDERDA O'ZGARTIRILDI, window.location.origin ishlatilmaydi
 
-    // Speech Recognition
+    // --- OVOZLI YOZISH (ENGLISH) ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = SpeechRecognition ? new SpeechRecognition() : null;
-    if(recognition) {
-        recognition.lang = 'uz-UZ';
-        recognition.onresult = (e) => {
-            document.getElementById('msgInput').value = e.results[0][0].transcript;
+    let recognition = null;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US'; // FAQAT INGLIZCHA QILINDI
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            document.getElementById('micBtn').classList.add('active-mic');
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            document.getElementById('msgInput').value = transcript;
+        };
+
+        recognition.onend = () => {
             document.getElementById('micBtn').classList.remove('active-mic');
         };
-        recognition.onend = () => document.getElementById('micBtn').classList.remove('active-mic');
+
+        recognition.onerror = () => {
+            document.getElementById('micBtn').classList.remove('active-mic');
+        };
     }
 
     function toggleSTT() {
-        if(!recognition) return alert("Brauzer qo'llab-quvvatlamaydi");
-        document.getElementById('micBtn').classList.add('active-mic');
-        recognition.start();
+        if (!recognition) return alert("Your browser does not support voice input.");
+        try {
+            recognition.start();
+        } catch (e) {
+            recognition.stop();
+        }
     }
 
+    // --- API KEY GENERATION ---
     async function generateKey() {
         const user = document.getElementById('username').value;
-        if(!user) return;
+        if (!user) return alert("Please enter a username!");
+
         try {
             const res = await fetch(`${BASE_URL}/generate-key`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username: user})
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user })
             });
             const data = await res.json();
             myApiKey = data.api_key;
-            const el = document.getElementById('keyShow');
-            el.innerHTML = `<i class="fas fa-check-circle"></i> Kalit faollashtirildi: <b>${myApiKey}</b>`;
-            el.style.display = "block";
-        } catch(e) { alert("Xatolik yuz berdi"); }
+            
+            const badge = document.getElementById('keyShow');
+            badge.innerHTML = `<i class="fas fa-check"></i> Key Activated: <strong>${myApiKey}</strong>`;
+            badge.style.display = "block";
+        } catch (e) {
+            alert("Error: Connection to backend failed!");
+        }
     }
 
+    // --- AI CHAT LOGIC ---
     async function askAI() {
         const input = document.getElementById('msgInput');
         const text = input.value.trim();
-        if(!text || !myApiKey) return;
+        if (!text || !myApiKey) return;
 
         const chatBox = document.getElementById('chat-box');
         chatBox.innerHTML += `<div class="user-msg message">${text}</div>`;
@@ -170,14 +199,17 @@
         
         const aiDiv = document.createElement('div');
         aiDiv.className = 'ai-msg message';
-        aiDiv.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i>`;
+        aiDiv.innerHTML = `<i class="fas fa-spinner fa-spin"></i>`;
         chatBox.appendChild(aiDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
 
         try {
             const response = await fetch(`${BASE_URL}/v1/chat`, {
                 method: 'POST',
-                headers: { 'X-Sharof-API-Key': myApiKey, 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-Sharof-API-Key': myApiKey 
+                },
                 body: JSON.stringify({ message: text })
             });
 
@@ -188,18 +220,29 @@
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
-                const chunk = decoder.decode(value);
-                const lines = chunk.split("\n");
-                lines.forEach(line => {
+                
+                const chunk = decoder.decode(value).split("\n");
+                chunk.forEach(line => {
                     if (line.startsWith("data: ")) {
-                        const data = JSON.parse(line.substring(6));
-                        if(data.reply) aiDiv.innerText += data.reply;
+                        try {
+                            const data = JSON.parse(line.substring(6));
+                            if(data.reply) {
+                                aiDiv.innerText += data.reply;
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                            }
+                        } catch(e) {}
                     }
                 });
-                chatBox.scrollTop = chatBox.scrollHeight;
             }
-        } catch (e) { aiDiv.innerText = "Xatolik: Aloqa uzildi."; }
+        } catch (e) {
+            aiDiv.innerText = "Error: Failed to connect to AI server.";
+        }
     }
+
+    document.getElementById('msgInput').addEventListener("keypress", (e) => {
+        if (e.key === "Enter") askAI();
+    });
 </script>
+
 </body>
 </html>
